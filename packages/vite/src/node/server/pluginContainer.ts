@@ -477,7 +477,12 @@ export async function createPluginContainer(
       for (const plugin of plugins) {
         if (!plugin.load) continue
         ctx._activePlugin = plugin
-        const result = await plugin.load.call(ctx as any, id, ssr)
+        let result: LoadResult;
+        try {
+          result = await plugin.load.call(ctx as any, id, ssr)
+        } catch (e) {
+          ctx.error(e);
+        }
         if (result != null) {
           return result
         }
